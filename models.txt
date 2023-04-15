@@ -1,0 +1,41 @@
+//neatext and logistic regression
+
+#depression detection and questionnaire
+#preprocessing : neattext
+#model : logistic regression
+#questionnare : PHQ-9
+# PHQ-9 score ≥10 had a sensitivity of 88% and a specificity of 88% for major depression.
+
+import pandas as pd
+import numpy as np
+import neattext.functions as nfx
+from sklearn.linear_model import LogisticRegression
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.pipeline import Pipeline
+
+
+df = pd.read_csv("depression_detection.csv")
+df['Clean_Text'] = df['text'].apply(nfx.remove_userhandles)
+#df['Clean_Text'] = df['Clean_Text'].apply(nfx.remove_stopwords)
+#print(df)
+Xfeatures = df['Clean_Text']
+ylabels = df['label']
+X_train, X_test,y_train, y_test = train_test_split(Xfeatures,ylabels,random_state=104, test_size=0.25, shuffle=True)
+pipe_lr = Pipeline(steps=[('cv',CountVectorizer()),('lr',LogisticRegression(solver='lbfgs',max_iter=1000))])
+pipe_lr.fit(X_train,y_train)
+
+print(pipe_lr.score(X_test,y_test))
+
+#predict
+sample1 = input("enter a scentence :")
+
+
+if pipe_lr.predict([sample1]):
+    print("depressed")
+    #print("answer the following questions as \n1-'Not at all'\n2-'several days'\n3-'more than half the days'\n4-'nearly every day'")
+    #aksQns()
+else:
+    print("not depressed")
+
